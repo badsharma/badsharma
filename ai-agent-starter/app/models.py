@@ -1,18 +1,24 @@
-"""Pydantic data models used by the agent."""
+"""Data models used by the agent."""
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from dataclasses import dataclass, field
 
 
-class AgentRequest(BaseModel):
+@dataclass(frozen=True)
+class AgentRequest:
     """Incoming request payload for the agent."""
 
-    prompt: str = Field(..., min_length=1, description="User prompt for the agent")
+    prompt: str
+
+    def __post_init__(self) -> None:
+        if not self.prompt or not self.prompt.strip():
+            raise ValueError("prompt must be a non-empty string")
 
 
-class AgentResponse(BaseModel):
+@dataclass(frozen=True)
+class AgentResponse:
     """Outgoing response from the agent."""
 
     output: str
-    used_tools: list[str] = Field(default_factory=list)
+    used_tools: list[str] = field(default_factory=list)
